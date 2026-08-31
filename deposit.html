@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Deposit — MyGame</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<main class="app">
+<header class="top"><div><div class="kicker">WALLET</div><h1 style="margin:4px 0;font-size:26px">Deposit</h1></div></header>
+<div class="notice">Ini hanya simulasi UI. Tidak ada pembayaran nyata dan tidak ada koneksi bank/QRIS pada versi prototype.</div>
+<section class="section"><div class="card">
+<div class="form-row"><label>Nominal Demo</label><select class="input" id="nom"><option value="10000">Rp 10.000</option><option value="50000">Rp 50.000</option><option value="100000">Rp 100.000</option><option value="250000">Rp 250.000</option></select></div>
+<button class="gold-btn" style="width:100%" onclick="addWallet(document.getElementById('nom').value)">Konfirmasi Deposit Demo</button>
+</div></section>
+</main><script>nav(2)</script><div class="toast"></div>
+<script src="assets/app.js"></script></body></html>

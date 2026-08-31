@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Misi — MyGame</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<main class="app">
+<header class="top"><div><div class="kicker">MYGAME</div><h1 style="margin:4px 0;font-size:26px">Misi & Reward</h1></div><div class="card" style="padding:8px 11px;color:var(--gold)" id="mc">0</div></header>
+<div class="notice">Selesaikan misi prototype untuk mendapatkan Coin. Nantinya aturan reward dapat dipindahkan ke database Supabase.</div>
+<section class="section"><div class="head"><h2>Misi Hari Ini</h2></div>
+<div class="card">
+<div class="mission"><div class="mi">🎁</div><div><h3>Bonus Check-in</h3><p>Buka MyGame hari ini</p></div><button class="claim" id="c1" onclick="claim('checkin',300)">+300</button></div>
+<hr style="border:0;border-top:1px solid #282b43;margin:14px 0">
+<div class="mission"><div class="mi">🎮</div><div><h3>Mainkan Game Demo</h3><p>Selesaikan satu permainan</p></div><button class="claim" id="c2" onclick="claim('game',500)">+500</button></div>
+<hr style="border:0;border-top:1px solid #282b43;margin:14px 0">
+<div class="mission"><div class="mi">👥</div><div><h3>Undang Teman</h3><p>Bagikan kode referral</p></div><button class="claim" id="c3" onclick="claim('ref',1000)">+1K</button></div>
+</div></section>
+<section class="section"><div class="head"><h2>Reward Mingguan</h2></div><div class="card"><div class="mission"><div class="mi">🏆</div><div><h3>7 hari aktif</h3><p>Bonus milestone prototype</p></div><button class="claim" id="c4" onclick="claim('week',3000)">+3K</button></div></div></section>
+</main><script>nav(1)</script><div class="toast"></div>
+<script src="assets/app.js"></script>
+<script>
+protect();let s=state();document.getElementById('mc').textContent=coin(s.coins);
+['c1','c2','c3','c4'].forEach((id,i)=>{if(s.claims[['checkin','game','ref','week'][i]])document.getElementById(id).textContent='Sudah';});
+</script>
+</body></html>

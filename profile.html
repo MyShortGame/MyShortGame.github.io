@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Profile — MyGame</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<main class="app">
+<header class="top"><div><div class="kicker">ACCOUNT</div><h1 style="margin:4px 0;font-size:26px">Profile</h1></div></header>
+<div class="card profile"><div class="avatar" id="av">M</div><div><h2 style="margin:0" data-user>Member</h2><div class="label">Member MyGame • Prototype</div></div></div>
+<section class="section card">
+<div class="menu"><b>Data Akun</b><span>›</span></div><div class="menu"><b>Keamanan</b><span>›</span></div><div class="menu"><b>Notifikasi</b><span>›</span></div><div class="menu" onclick="logout()"><b style="color:var(--danger)">Keluar</b><span>›</span></div>
+</section>
+</main><script>nav(4)</script><div class="toast"></div>
+<script src="assets/app.js"></script>
+<script>protect();let n=state().user?.name||'Member';document.getElementById('av').textContent=n[0].toUpperCase();</script>
+</body></html>

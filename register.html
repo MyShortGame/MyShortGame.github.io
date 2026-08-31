@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Registrasi — MyGame</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<main class="app">
+<div class="auth-wrap"><div class="auth">
+<div class="brand"><img src="assets/logo.png"><b>My<i>Game</i></b></div>
+<h1>Buat Akun</h1><div class="sub">Buat akun prototype MyGame</div>
+<form onsubmit="register(event)">
+<div class="form-row"><label>Nama</label><input class="input" name="name" required placeholder="Nama kamu"></div>
+<div class="form-row"><label>Email</label><input class="input" type="email" name="email" required placeholder="nama@email.com"></div>
+<div class="form-row"><label>Password</label><input class="input" type="password" name="pass" required placeholder="Minimal 4 karakter"></div>
+<div class="form-row"><label>Konfirmasi Password</label><input class="input" type="password" name="pass2" required placeholder="Ulangi password"></div>
+<button class="gold-btn" type="submit">Daftar Sekarang</button>
+</form>
+<div class="switch">Sudah punya akun? <a href="login.html">Masuk</a></div>
+</div></div>
+</main><div class="toast"></div>
+<script src="assets/app.js"></script></body></html>

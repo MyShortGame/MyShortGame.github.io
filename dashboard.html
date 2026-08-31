@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Dashboard — MyGame</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<main class="app">
+<header class="top"><div class="brand"><img src="assets/logo.png"><div><b>My<i>Game</i></b><div style="font-size:10px;color:var(--muted)">Member Area</div></div></div><button class="btn" onclick="logout()">Keluar</button></header>
+<section class="hero"><div class="kicker">SELAMAT DATANG</div><h1><span data-user>Member</span> 👋</h1><p>Kelola game, misi dan reward kamu dari satu tempat.</p><div class="balance" id="coinBalance">0 Coin</div><div class="label">Saldo Coin Demo</div></section>
+<section class="section grid3"><div class="card stat"><strong id="s1">0</strong><span>Coin</span></div><div class="card stat"><strong>12</strong><span>Misi</span></div><div class="card stat"><strong>0</strong><span>Teman</span></div></section>
+<section class="section"><div class="head"><h2>Menu Utama</h2></div><div class="grid2">
+<a class="card" href="mission.html">🎯<br><b>Misi Harian</b><br><span class="label">Kumpulkan Coin</span></a>
+<a class="card" href="wallet.html">🪙<br><b>Wallet</b><br><span class="label">Lihat saldo</span></a>
+<a class="card" href="deposit.html">💳<br><b>Deposit</b><br><span class="label">Prototype</span></a>
+<a class="card" href="referral.html">👥<br><b>Referral</b><br><span class="label">Undang teman</span></a>
+</div></section>
+<section class="section"><div class="head"><h2>Game Pilihan</h2></div><div class="game-grid">
+<div class="game"><div class="symbol">🎴</div><h3>Kartu Nusantara</h3><p>Mode demo</p><div class="play">›</div></div>
+<div class="game"><div class="symbol">🏆</div><h3>Lucky Arena</h3><p>Event demo</p><div class="play">›</div></div>
+</div></section>
+</main><script>nav(0)</script><div class="toast"></div>
+<script src="assets/app.js"></script>
+<script>protect();let s=state();document.getElementById('coinBalance').textContent=coin(s.coins);document.getElementById('s1').textContent=s.coins.toLocaleString('id-ID');</script>
+</body></html>

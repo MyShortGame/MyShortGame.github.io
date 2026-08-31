@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Referral — MyGame</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<main class="app">
+<header class="top"><div><div class="kicker">COMMUNITY</div><h1 style="margin:4px 0;font-size:26px">Referral</h1></div></header>
+<div class="hero"><div class="kicker">KODE REFERRAL KAMU</div><h1 id="refcode" style="font-size:30px;letter-spacing:2px">MG000000</h1><p>Bagikan kode ini kepada teman. Sistem referral di versi ini hanya simulasi.</p><button class="gold-btn" onclick="copyRef()">Salin Kode</button></div>
+<section class="section grid3"><div class="card stat"><strong>0</strong><span>Teman</span></div><div class="card stat"><strong>0</strong><span>Aktif</span></div><div class="card stat"><strong>0</strong><span>Reward</span></div></div>
+<section class="section"><div class="head"><h2>Cara Kerja</h2></div><div class="card"><div class="menu"><b>1. Bagikan kode</b><span>01</span></div><div class="menu"><b>2. Teman mendaftar</b><span>02</span></div><div class="menu"><b>3. Reward tercatat</b><span>03</span></div></div></section>
+</main><script>nav(3)</script><div class="toast"></div>
+<script src="assets/app.js"></script>
+<script>
+protect();let r=state().ref;document.getElementById('refcode').textContent=r;
+function copyRef(){navigator.clipboard?.writeText(r);toast('Kode referral disalin.')}
+</script>
+</body></html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyShort Mining Virtual</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #090909;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    margin: 0 0 5px;
+    color: #f5c542;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.subtitle {
+    color: #aaa;
+}
+
+.balance-title {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.balance {
+    font-size: 34px;
+    font-weight: bold;
+    color: #f5c542;
+    margin-top: 5px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px solid #292929;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    background: #f5c542;
+    color: #111;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+.status {
+    margin-top: 15px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.success {
+    color: #70e000;
+}
+
+.error {
+    color: #ff7777;
+}
+
+.notice {
+    background: #211d0c;
+    border: 1px solid #5b4a16;
+    border-radius: 12px;
+    padding: 13px;
+    color: #ddd;
+    font-size: 13px;
+    line-height: 1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+        <h1>MyShort Mining</h1>
+        <div class="subtitle">
+            Mining Virtual / Sandbox
+        </div>
+    </div>
+
+    <div class="card">
+
+        <div class="balance-title">
+            Saldo MYC
+        </div>
+
+        <div id="balance" class="balance">
+            0 MYC
+        </div>
+
+        <button id="demoBtn">
+            🎁 Isi 1.000 MYC Demo
+        </button>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Mining Virtual 1.000 MYC</h2>
+
+        <div class="row">
+            <span>Harga</span>
+            <b>1.000 MYC</b>
+        </div>
+
+        <div class="row">
+            <span>Reward harian</span>
+            <b>30 MYC</b>
+        </div>
+
+        <div class="row">
+            <span>Durasi</span>
+            <b>30 hari</b>
+        </div>
+
+        <div class="row">
+            <span>Total maksimal</span>
+            <b>900 MYC</b>
+        </div>
+
+        <button id="activateBtn">
+            ⚡ Aktifkan Mining 30 Hari
+        </button>
+
+        <button id="claimBtn">
+            💰 Klaim Reward
+        </button>
+
+        <div id="status" class="status">
+            Memeriksa koneksi Supabase...
+        </div>
+
+    </div>
+
+    <div class="notice">
+        MYC pada halaman ini adalah saldo virtual/sandbox untuk pengujian.
+        Tidak dapat ditukar menjadi uang atau cryptocurrency dan bukan hasil
+        mining Monero/XMR.
+    </div>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- CONFIG SUPABASE -->
+<script src="js/supabase-config.js"></script>
+
+
+<script>
+
+let currentUser = null;
+let currentContract = null;
+
+
+/* Shortcut */
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+
+/* Format MYC */
+
+function formatMYC(value) {
+
+    return Number(value || 0)
+        .toLocaleString("id-ID") + " MYC";
+
+}
+
+
+/* Load data */
+
+async function loadMining() {
+
+    try {
+
+        const result =
+            await supabaseClient.auth.getUser();
+
+        if (result.error) {
+            throw result.error;
+        }
+
+        currentUser = result.data.user;
+
+        if (!currentUser) {
+
+            $("status").className =
+                "status error";
+
+            $("status").textContent =
+                "Belum login ke Supabase.\n" +
+                "Silakan login terlebih dahulu.";
+
+            return;
+        }
+
+
+        /* Pastikan wallet ada */
+
+        const walletRPC =
+            await supabaseClient.rpc(
+                "ms_ensure_wallet"
+            );
+
+        if (walletRPC.error) {
+            throw walletRPC.error;
+        }
+
+
+        /* Ambil saldo */
+
+        const wallet =
+            await supabaseClient
+                .from("ms_virtual_wallets")
+                .select("balance_myc")
+                .eq("user_id", currentUser.id)
+                .maybeSingle();
+
+        if (wallet.error) {
+            throw wallet.error;
+        }
+
+
+        $("balance").textContent =
+            formatMYC(
+                wallet.data?.balance_myc
+            );
+
+
+        /* Ambil kontrak Mining */
+
+        const contracts =
+            await supabaseClient
+                .from("ms_mining_contracts")
+                .select("*")
+                .eq("user_id", currentUser.id)
+                .order(
+                    "created_at",
+                    { ascending: false }
+                )
+                .limit(1)
+                .maybeSingle();
+
+        if (contracts.error) {
+            throw contracts.error;
+        }
+
+
+        currentContract =
+            contracts.data || null;
+
+
+        $("status").className =
+            "status success";
+
+
+        if (currentContract) {
+
+            $("status").textContent =
+                "✅ Supabase terhubung.\n" +
+                "Kontrak Mining ditemukan.";
+
+        } else {
+
+            $("status").textContent =
+                "✅ Supabase terhubung.\n" +
+                "Belum ada kontrak Mining.";
+
+        }
+
+    }
+
+    catch (error) {
+
+        $("status").className =
+            "status error";
+
+        $("status").textContent =
+            "❌ Gagal:\n" +
+            error.message;
+
+    }
+
+}
+
+
+/* Demo credit */
+
+$("demoBtn").addEventListener(
+    "click",
+    async function() {
+
+        $("status").className =
+            "status";
+
+        $("status").textContent =
+            "Memproses saldo demo...";
+
+        const result =
+            await supabaseClient.rpc(
+                "ms_demo_credit"
+            );
+
+        if (result.error) {
+
+            $("status").className =
+                "status error";
+
+            $("status").textContent =
+                "❌ " +
+                result.error.message;
+
+            return;
+        }
+
+
+        await loadMining();
+
+
+        $("status").className =
+            "status success";
+
+        $("status").textContent =
+            "✅ 1.000 MYC virtual berhasil ditambahkan.";
+
+    }
+);
+
+
+/* Activate Mining */
+
+$("activateBtn").addEventListener(
+    "click",
+    async function() {
+
+        if (!currentUser) {
+
+            $("status").className =
+                "status error";
+
+            $("status").textContent =
+                "Silakan login terlebih dahulu.";
+
+            return;
+        }
+
+
+        $("status").textContent =
+            "Mengaktifkan Mining...";
+
+
+        const packageResult =
+            await supabaseClient
+                .from("ms_virtual_packages")
+                .select("id")
+                .eq("code", "MS1000")
+                .eq("active", true)
+                .single();
+
+
+        if (packageResult.error) {
+
+            $("status").className =
+                "status error";
+
+            $("status").textContent =
+                "❌ " +
+                packageResult.error.message;
+
+            return;
+        }
+
+
+        const result =
+            await supabaseClient.rpc(
+                "ms_activate_package",
+                {
+                    p_package_id:
+                        packageResult.data.id
+                }
+            );
+
+
+        if (result.error) {
+
+            $("status").className =
+                "status error";
+
+            $("status").textContent =
+                "❌ " +
+                result.error.message;
+
+            return;
+        }
+
+
+        await loadMining();
+
+
+        $("status").className =
+            "status success";
+
+        $("status").textContent =
+            "✅ Mining virtual berhasil diaktifkan.";
+
+    }
+);
+
+
+/* Claim reward */
+
+$("claimBtn").addEventListener(
+    "click",
+    async function() {
+
+        if (!currentContract) {
+
+            $("status").className =
+                "status error";
+
+            $("status").textContent =
+                "Belum ada kontrak Mining.";
+
+            return;
+        }
+
+
+        $("status").textContent =
+            "Memproses reward...";
+
+
+        const result =
+            await supabaseClient.rpc(
+                "ms_claim_mining",
+                {
+                    p_contract_id:
+                        currentContract.id
+                }
+            );
+
+
+        if (result.error) {
+
+            $("status").className =
+                "status error";
+
+            $("status").textContent =
+                "❌ " +
+                result.error.message;
+
+            return;
+        }
+
+
+        await loadMining();
+
+
+        const reward =
+            result.data?.reward_myc || 0;
+
+
+        $("status").className =
+            "status success";
+
+        $("status").textContent =
+            "✅ Reward berhasil diproses:\n" +
+            formatMYC(reward);
+
+    }
+);
+
+
+/* Jalankan */
+
+loadMining();
+
+</script>
+
+</body>
+</html>

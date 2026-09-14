@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fortune Spin — Slot Game</title>
+<style>
+:root{
+  --bg:#07090d;--panel:#11151d;--panel2:#181d27;--gold:#f6c85f;--gold2:#fff0ad;
+  --red:#c92f38;--text:#f7f7f8;--muted:#9da4b0;--line:#3b3321;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:
+radial-gradient(circle at 50% -10%,#30343d 0,#11141b 34%,#050609 78%);color:var(--text)}
+button{font:inherit}
+.game-shell{width:min(100%,760px);margin:auto;min-height:100vh;padding:12px 12px 22px}
+.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:12px}
+.stat-card{background:linear-gradient(180deg,#1c212b,#0e1117);border:1px solid #303641;border-radius:12px;padding:8px 10px;box-shadow:0 8px 22px #0008}
+.stat-label{display:block;color:#8f96a1;font-size:10px;letter-spacing:1.3px}
+.stat-card strong{font-size:clamp(15px,4vw,21px);letter-spacing:.3px}
+.jackpot-card{text-align:right}
+.logo{text-align:center;line-height:.85;filter:drop-shadow(0 3px 8px #000)}
+.logo-small{font-weight:800;font-size:10px;letter-spacing:2px;color:var(--gold)}
+.logo-main{font-size:28px;font-weight:950;letter-spacing:2px;background:linear-gradient(#fff6c8,#f0b83d);-webkit-background-clip:text;color:transparent}
+.machine{display:flex;align-items:stretch;gap:5px}
+.payline-side{width:24px;display:flex;flex-direction:column;justify-content:space-around;align-items:center;color:#7c8490;font-size:10px;font-weight:800}
+.reel-frame{position:relative;flex:1;min-width:0;padding:7px;border:2px solid #75602f;border-radius:16px;background:linear-gradient(145deg,#29251b,#0c0e12 35%,#1d1910);box-shadow:0 0 0 2px #17130c,0 16px 35px #000b, inset 0 0 22px #000}
+.reels{height:min(57vw,390px);min-height:275px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;overflow:hidden;border-radius:10px;background:#030405}
+.reel{position:relative;overflow:hidden;background:linear-gradient(90deg,#10131a,#272c35 50%,#0d1015);border-right:1px solid #454a52}
+.reel:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#0008,transparent 22%,transparent 78%,#0008)}
+.reel-strip{position:absolute;top:0;left:0;width:100%;will-change:transform}
+.symbol{height:calc((min(57vw,390px) - 14px)/3);min-height:84px;display:flex;align-items:center;justify-content:center;font-size:clamp(35px,9vw,68px);text-shadow:0 3px 5px #000,0 0 12px #fff2;user-select:none}
+.symbol.wild{font-size:clamp(30px,7.5vw,58px)}
+.win-lines{position:absolute;inset:7px;pointer-events:none}
+.win-line{position:absolute;height:4px;border-radius:9px;background:linear-gradient(90deg,transparent,var(--gold2),var(--gold),transparent);box-shadow:0 0 10px #f6c85f;animation:blink .65s infinite alternate}
+@keyframes blink{to{opacity:.35;filter:brightness(1.5)}}
+.result-area{padding:10px 32px}
+.result-box{border:1px solid #4a402a;border-radius:11px;background:#0d1016;text-align:center;padding:8px;box-shadow:inset 0 0 15px #000}
+.result-box span{display:block;font-size:9px;letter-spacing:2px;color:var(--gold)}
+.result-box strong{display:block;color:#fff2b8;font-size:23px}
+.result-box small{color:var(--muted);font-size:10px}
+.controls{display:grid;grid-template-columns:42px 1fr 70px 125px;gap:8px;align-items:center}
+.info-btn,.max-btn,.bet-control,.spin-btn{border:1px solid #514528;background:linear-gradient(180deg,#24201a,#0e1015);color:var(--text);border-radius:12px;box-shadow:0 7px 16px #0008}
+.info-btn{height:52px;color:var(--gold);font-weight:900;font-size:22px}
+.bet-control{height:58px;display:flex;align-items:center;justify-content:space-between;padding:4px}
+.bet-control button{width:38px;height:48px;border:0;border-radius:9px;background:#20252d;color:#fff;font-size:25px}
+.bet-value{text-align:center;min-width:0}.bet-value span{display:block;color:#9299a5;font-size:8px;letter-spacing:1px}.bet-value strong{font-size:15px}
+.max-btn{height:58px;color:var(--gold2);font-size:11px;font-weight:950;line-height:1.1}
+.spin-btn{height:66px;border-color:#b88b35;background:linear-gradient(180deg,#ffe28a 0,#e2a62d 48%,#9d6513 100%);color:#171108;text-shadow:0 1px #fff7;font-weight:950;box-shadow:0 0 0 1px #3b2a10,0 9px 25px #000b,inset 0 1px #fff8}
+.spin-btn strong{display:block;font-size:23px;letter-spacing:1px}.spin-btn span{display:block;font-size:7px;letter-spacing:1px}
+button:active{transform:translateY(1px)}button:disabled{opacity:.45;filter:grayscale(.5)}
+.auto-row{display:flex;justify-content:center;gap:6px;margin-top:9px}
+.auto-row button{border:1px solid #363b45;background:#12161d;color:#bfc4cc;border-radius:8px;padding:7px 11px;font-size:10px}
+.auto-row button.active{border-color:#b88b35;color:var(--gold2)}
+dialog{border:0;border-radius:16px;background:#12151b;color:#fff;max-width:430px;width:calc(100% - 28px);padding:0;box-shadow:0 25px 70px #000e}
+dialog::backdrop{background:#000b;backdrop-filter:blur(4px)}
+.dialog-card{padding:20px}.dialog-card h2{margin:0 0 7px;color:var(--gold)}.dialog-card p{color:#9da4b0;font-size:12px}.payrow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2b3038}.dialog-close{float:right;background:none;border:0;color:#fff;font-size:25px}
+.toast{position:fixed;left:50%;bottom:105px;transform:translateX(-50%) translateY(20px);background:#171a20;border:1px solid #66532a;color:#ffe9a1;padding:9px 14px;border-radius:9px;font-size:11px;opacity:0;pointer-events:none;transition:.2s;z-index:10}.toast.show{opacity:1;transform:translateX(-50%)}
+@media(max-width:560px){.game-shell{padding-top:8px}.controls{grid-template-columns:38px 1fr 62px 106px}.payline-side{width:17px}.result-area{padding-left:22px;padding-right:22px}}
+</style>
+</head>
+<body>
+<div class="game-shell">
+<header class="topbar">
+  <div class="stat-card"><span class="stat-label">KREDIT</span><strong id="credit">1,000,000</strong></div>
+  <div class="logo"><div class="logo-small">✦ FORTUNE ✦</div><div class="logo-main">SPIN</div></div>
+  <div class="stat-card jackpot-card"><span class="stat-label">JACKPOT</span><strong id="jackpot">10,000,000</strong></div>
+</header>
+
+<main class="machine">
+  <div class="payline-side" aria-hidden="true"><span>4</span><span>2</span><span>6</span><span>8</span><span>1</span><span>9</span><span>7</span><span>3</span><span>5</span></div>
+  <section class="reel-frame" aria-label="Mesin slot 5x3">
+    <div id="reels" class="reels">
+      <div class="reel"><div class="reel-strip"></div></div><div class="reel"><div class="reel-strip"></div></div>
+      <div class="reel"><div class="reel-strip"></div></div><div class="reel"><div class="reel-strip"></div></div>
+      <div class="reel"><div class="reel-strip"></div></div>
+    </div>
+    <div id="win-lines" class="win-lines"></div>
+  </section>
+  <div class="payline-side" aria-hidden="true"><span>4</span><span>2</span><span>6</span><span>8</span><span>1</span><span>9</span><span>7</span><span>3</span><span>5</span></div>
+</main>
+
+<section class="result-area"><div class="result-box"><span>WIN</span><strong id="win">0</strong><small id="message">Tekan SPIN untuk bermain</small></div></section>
+
+<footer class="controls">
+  <button class="info-btn" id="infoBtn" type="button">i</button>
+  <div class="bet-control"><button id="betMinus" type="button">−</button><div class="bet-value"><span>TOTAL BET</span><strong id="bet">10,000</strong></div><button id="betPlus" type="button">+</button></div>
+  <button class="max-btn" id="maxBet" type="button">MAX<br>BET</button>
+  <button class="spin-btn" id="spinBtn" type="button"><strong>SPIN</strong><span id="spinHint">10 / 100 SPIN</span></button>
+</footer>
+<div class="auto-row">
+  <button id="auto10">AUTO 10</button><button id="auto100">AUTO 100</button><button id="stopAuto">STOP</button>
+</div>
+</div>
+
+<dialog id="paytableDialog"><div class="dialog-card"><button class="dialog-close" id="closeInfo">×</button><h2>PAYTABLE</h2><p>Kredit virtual untuk permainan demo. Tidak menggunakan uang asli.</p><div class="payrow"><span>💎💎💎</span><b>10× BET</b></div><div class="payrow"><span>7️⃣7️⃣7️⃣</span><b>25× BET</b></div><div class="payrow"><span>👑👑👑</span><b>50× BET</b></div><div class="payrow"><span>💰💰💰</span><b>100× BET</b></div></div></dialog>
+<div id="toast" class="toast"></div>
+
+<script>
+const symbols=[
+  {e:"🍒",m:4},{e:"🍋",m:5},{e:"🍊",m:7},{e:"🔔",m:10},{e:"⭐",m:15},
+  {e:"💎",m:25},{e:"7️⃣",m:40},{e:"👑",m:60},{e:"💰",m:100},{e:"🃏",m:0,wild:true}
+];
+const reels=[...document.querySelectorAll(".reel-strip")];
+let credit=1000000, bet=10000, spinning=false, autoLeft=0, autoTimer=null;
+const fmt=n=>Math.floor(n).toLocaleString("en-US");
+const $=id=>document.getElementById(id);
+function renderBalance(){ $("credit").textContent=fmt(credit); $("bet").textContent=fmt(bet); }
+function randomSym(){return symbols[Math.floor(Math.random()*symbols.length)]}
+function buildReel(strip){
+  strip.innerHTML="";
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<18;i++){let s=randomSym();let d=document.createElement("div");d.className="symbol"+(s.wild?" wild":"");d.textContent=s.e;frag.appendChild(d)}
+  strip.appendChild(frag);
+}
+reels.forEach(buildReel);
+
+function evaluate(){
+  const grid=[];
+  reels.forEach(r=>{grid.push([...r.children].slice(-3).map(x=>x.textContent))});
+  // Evaluation uses the center row plus a few simple paylines.
+  const lines=[[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2]];
+  let total=0, wins=0;
+  lines.forEach(line=>{
+    const a=line.map((row,col)=>grid[col][row]);
+    const first=a[0];
+    let count=1;
+    for(let i=1;i<a.length;i++){if(a[i]===first||a[i]==="🃏"||first==="🃏")count++;else break}
+    if(count>=3){
+      let sym=symbols.find(s=>s.e===first)||symbols[0];
+      total+=bet*(sym.m||5)*(count===5?2:1);wins++;
+    }
+  });
+  return {total,wins};
+}
+function spin(){
+  if(spinning)return;
+  if(credit<bet){showToast("Kredit tidak cukup"); autoLeft=0; return}
+  credit-=bet; renderBalance(); spinning=true; $("spinBtn").disabled=true;
+  $("win").textContent="0"; $("message").textContent="Reel berputar...";
+  document.querySelectorAll(".win-line").forEach(x=>x.remove());
+  reels.forEach((strip,i)=>{
+    buildReel(strip);
+    strip.style.transition="none"; strip.style.transform="translateY(0)";
+    requestAnimationFrame(()=>{
+      const step=strip.children[0].getBoundingClientRect().height;
+      const target=-(15+i*1)*step;
+      strip.style.transition=`transform ${1.25+i*.18}s cubic-bezier(.12,.75,.18,1)`;
+      strip.style.transform=`translateY(${target}px)`;
+    });
+  });
+  setTimeout(()=>{
+    const result=evaluate(); credit+=result.total; renderBalance();
+    $("win").textContent=fmt(result.total);
+    $("message").textContent=result.total?`Menang ${result.wins} garis!`:"Coba lagi";
+    if(result.total){
+      for(let i=0;i<Math.min(result.wins,3);i++){
+        const l=document.createElement("div");l.className="win-line";l.style.top=(25+i*25)+"%";l.style.left="3%";l.style.right="3%";$("win-lines").appendChild(l)
+      }
+    }
+    spinning=false;$("spinBtn").disabled=false;
+    if(autoLeft>0){autoLeft--; if(autoLeft>0)autoTimer=setTimeout(spin,650);else stopAuto()}
+  },2350);
+}
+function setBet(v){bet=Math.max(1000,Math.min(100000, v));renderBalance()}
+function startAuto(n){if(spinning)return;stopAuto();autoLeft=n;$("message").textContent=`AUTO ${n} aktif`;spin()}
+function stopAuto(){autoLeft=0;if(autoTimer)clearTimeout(autoTimer);autoTimer=null}
+function showToast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1600)}
+$("betMinus").onclick=()=>setBet(bet-1000);
+$("betPlus").onclick=()=>setBet(bet+1000);
+$("maxBet").onclick=()=>setBet(100000);
+$("spinBtn").onclick=spin;
+$("auto10").onclick=()=>startAuto(10);
+$("auto100").onclick=()=>startAuto(100);
+$("stopAuto").onclick=stopAuto;
+$("infoBtn").onclick=()=>$("paytableDialog").showModal();
+$("closeInfo").onclick=()=>$("paytableDialog").close();
+renderBalance();
+</script>
+</body>
+</html>

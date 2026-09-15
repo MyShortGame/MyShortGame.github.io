@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a0f">
+<title>Fortune Spin</title>
+
+<style>
+:root{
+  --bg:#07090d;
+  --panel:#11151d;
+  --panel2:#1b2029;
+  --gold:#f3c65b;
+  --gold2:#fff0aa;
+  --muted:#929aa6;
+  --line:#4c4025;
+  --shadow:#000b;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  min-height:100%;
+  background:radial-gradient(circle at 50% -5%,#30353e 0,#11151c 30%,#05070a 72%);
+  color:#f7f7f8;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body{overflow-x:hidden}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.game-shell{width:min(100%,760px);min-height:100vh;margin:auto;padding:12px 12px 28px}
+.topbar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center;margin-bottom:14px}
+.stat-card{min-width:0;padding:9px 12px;border:1px solid #333945;border-radius:15px;background:linear-gradient(180deg,#1b202a,#0d1016);box-shadow:0 9px 25px #0009,inset 0 1px #ffffff0c}
+.stat-label{display:block;color:#8f96a2;font-size:10px;letter-spacing:1.6px}
+.stat-card strong{display:block;margin-top:2px;font-size:clamp(15px,4vw,23px);white-space:nowrap}
+.jackpot-card{text-align:right}
+.logo{text-align:center;line-height:.82;white-space:nowrap;text-shadow:0 3px 10px #000}
+.logo-small{font-size:10px;letter-spacing:2px;font-weight:900;color:var(--gold)}
+.logo-main{font-size:clamp(28px,8vw,48px);font-weight:950;letter-spacing:2px;color:var(--gold);background:linear-gradient(#fff5c2,#e9ae32);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+.machine{display:flex;gap:5px;align-items:stretch}
+.payline-side{width:22px;flex:0 0 22px;display:grid;grid-template-rows:repeat(9,1fr);align-items:center;justify-items:center;color:#858d99;font-size:10px;font-weight:800}
+.reel-frame{position:relative;flex:1;min-width:0;padding:7px;border:2px solid #80672d;border-radius:18px;background:linear-gradient(145deg,#29251a,#0b0e13 35%,#1c170d);box-shadow:0 0 0 2px #16120b,0 18px 40px #000b,inset 0 0 25px #000}
+.reels{position:relative;width:100%;height:clamp(270px,58vw,390px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;overflow:hidden;border-radius:11px;background:#030405}
+.reel{position:relative;min-width:0;height:100%;overflow:hidden;background:linear-gradient(90deg,#0c0f15,#252b34 50%,#0b0e13);border-right:1px solid #444a53}
+.reel:last-child{border-right:0}
+.reel:before{content:"";position:absolute;z-index:2;inset:0;pointer-events:none;background:linear-gradient(90deg,#0009,transparent 20%,transparent 80%,#0009)}
+.reel:after{content:"";position:absolute;z-index:3;left:0;right:0;top:0;height:34%;pointer-events:none;background:linear-gradient(#020305e8,transparent)}
+.reel-strip{position:absolute;left:0;top:0;width:100%;transform:translate3d(0,0,0);will-change:transform}
+.symbol{height:clamp(90px,19.333vw,130px);display:flex;align-items:center;justify-content:center;font-size:clamp(36px,9vw,68px);line-height:1;user-select:none;text-shadow:0 4px 5px #000,0 0 14px #fff2}
+.symbol.wild{font-size:clamp(31px,8vw,60px)}
+.center-glow{position:absolute;z-index:4;left:7px;right:7px;top:33.333%;height:33.333%;pointer-events:none;border-top:1px solid #f3c65b24;border-bottom:1px solid #f3c65b24;box-shadow:inset 0 0 24px #0003}
+.win-lines{position:absolute;z-index:5;inset:7px;pointer-events:none}
+.win-line{position:absolute;left:2%;right:2%;height:4px;border-radius:99px;background:linear-gradient(90deg,transparent,var(--gold2),var(--gold),transparent);box-shadow:0 0 12px var(--gold);animation:flash .55s infinite alternate}
+@keyframes flash{from{opacity:.45}to{opacity:1;filter:brightness(1.5)}}
+
+.result-area{padding:10px 28px}
+.result-box{padding:8px 10px;text-align:center;border:1px solid #4b4028;border-radius:14px;background:linear-gradient(180deg,#0e1218,#090b10);box-shadow:inset 0 0 18px #000,0 6px 18px #0008}
+.result-box span{display:block;color:var(--gold);font-size:9px;letter-spacing:2.4px}
+.result-box strong{display:block;margin:1px 0;font-size:28px;color:var(--gold2)}
+.result-box small{color:#9da4af;font-size:11px}
+
+.controls{display:grid;grid-template-columns:42px minmax(0,1fr) 72px minmax(108px,1.35fr);gap:8px;align-items:center}
+.info-btn,.bet-control,.max-btn,.spin-btn{border-radius:14px;box-shadow:0 8px 20px #0009}
+.info-btn{height:58px;border:1px solid #564825;background:linear-gradient(180deg,#201e18,#0d1015);color:var(--gold);font-size:23px;font-weight:900}
+.bet-control{height:60px;display:grid;grid-template-columns:42px minmax(0,1fr) 42px;gap:5px;padding:4px;border:1px solid #514526;background:linear-gradient(180deg,#20242c,#0c0f14)}
+.bet-control button{height:50px;border:0;border-radius:10px;background:#202630;color:#fff;font-size:27px;font-weight:500}
+.bet-value{text-align:center;min-width:0;align-self:center}
+.bet-value span{display:block;color:#8f97a3;font-size:8px;letter-spacing:1.2px}
+.bet-value strong{display:block;font-size:16px;white-space:nowrap}
+.max-btn{height:60px;border:1px solid #5b4b27;background:linear-gradient(180deg,#27231b,#0e1015);color:var(--gold2);font-size:12px;font-weight:950;line-height:1.05}
+.spin-btn{height:68px;border:1px solid #b48731;background:linear-gradient(180deg,#ffe58f 0,#e7ae39 47%,#a76c16 100%);color:#171107;box-shadow:0 0 0 1px #3a2a10,0 10px 25px #000c,inset 0 1px #fff9}
+.spin-btn strong{display:block;font-size:clamp(20px,5vw,28px);letter-spacing:1px}
+.spin-btn span{display:block;font-size:8px;letter-spacing:1px}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.5;cursor:not-allowed}
+
+.auto-row{display:flex;justify-content:center;gap:8px;margin-top:9px}
+.auto-row button{padding:8px 13px;border:1px solid #39404b;border-radius:9px;background:#12161d;color:#c2c7ce;font-size:10px}
+.auto-row button.active{border-color:#b78b34;color:var(--gold2)}
+
+dialog{width:min(430px,calc(100% - 28px));padding:0;border:1px solid #514526;border-radius:17px;background:#12161d;color:#fff;box-shadow:0 25px 70px #000e}
+dialog::backdrop{background:#000c;backdrop-filter:blur(4px)}
+.dialog-card{padding:20px}
+.dialog-close{float:right;border:0;background:none;color:#fff;font-size:26px}
+.dialog-card h2{margin:0;color:var(--gold)}
+.dialog-card p{color:#9ca4af;font-size:12px}
+.payrow{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #2b3038}
+.toast{position:fixed;z-index:20;left:50%;bottom:110px;transform:translate(-50%,20px);padding:9px 14px;border:1px solid #67552d;border-radius:9px;background:#181b21;color:var(--gold2);font-size:11px;opacity:0;pointer-events:none;transition:.2s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:560px){
+  .game-shell{padding:8px 8px 24px}
+  .topbar{gap:6px}
+  .stat-card{padding:8px}
+  .stat-card strong{font-size:15px}
+  .logo-main{font-size:31px}
+  .machine{gap:3px}
+  .payline-side{width:18px;flex-basis:18px;font-size:9px}
+  .reel-frame{padding:6px;border-radius:16px}
+  .reels{height:clamp(270px,75vw,410px);gap:2px}
+  .symbol{height:calc(clamp(270px,75vw,410px) / 3)}
+  .result-area{padding-left:20px;padding-right:20px}
+  .controls{grid-template-columns:38px minmax(0,1fr) 68px minmax(104px,1.15fr);gap:6px}
+  .bet-control{grid-template-columns:38px minmax(0,1fr) 38px}
+  .bet-control button{height:50px}
+}
+@media(max-width:380px){
+  .controls{grid-template-columns:35px minmax(0,1fr) 62px 100px;gap:5px}
+  .bet-control{grid-template-columns:34px minmax(0,1fr) 34px}
+  .bet-value strong{font-size:14px}
+  .max-btn{font-size:10px}
+  .spin-btn strong{font-size:20px}
+}
+</style>
+</head>
+
+<body>
+<div class="game-shell">
+<header class="topbar">
+  <div class="stat-card"><span class="stat-label">KREDIT</span><strong id="credit">1,000,000</strong></div>
+  <div class="logo"><div class="logo-small">✦ FORTUNE ✦</div><div class="logo-main">SPIN</div></div>
+  <div class="stat-card jackpot-card"><span class="stat-label">JACKPOT</span><strong id="jackpot">10,000,000</strong></div>
+</header>
+
+<main class="machine">
+  <div class="payline-side" aria-hidden="true"><span>4</span><span>2</span><span>6</span><span>8</span><span>1</span><span>9</span><span>7</span><span>3</span><span>5</span></div>
+  <section class="reel-frame" aria-label="Slot 5 kolom 3 baris">
+    <div id="reels" class="reels">
+      <div class="reel"><div class="reel-strip"></div></div>
+      <div class="reel"><div class="reel-strip"></div></div>
+      <div class="reel"><div class="reel-strip"></div></div>
+      <div class="reel"><div class="reel-strip"></div></div>
+      <div class="reel"><div class="reel-strip"></div></div>
+    </div>
+    <div class="center-glow"></div>
+    <div id="win-lines" class="win-lines" aria-hidden="true"></div>
+  </section>
+  <div class="payline-side" aria-hidden="true"><span>4</span><span>2</span><span>6</span><span>8</span><span>1</span><span>9</span><span>7</span><span>3</span><span>5</span></div>
+</main>
+
+<section class="result-area">
+  <div class="result-box"><span>WIN</span><strong id="win">0</strong><small id="message">Tekan SPIN untuk bermain</small></div>
+</section>
+
+<footer class="controls">
+  <button class="info-btn" id="infoBtn" type="button" aria-label="Paytable">i</button>
+  <div class="bet-control">
+    <button id="betMinus" type="button" aria-label="Kurangi taruhan">−</button>
+    <div class="bet-value"><span>TOTAL BET</span><strong id="bet">10,000</strong></div>
+    <button id="betPlus" type="button" aria-label="Tambah taruhan">+</button>
+  </div>
+  <button class="max-btn" id="maxBet" type="button">MAX<br>BET</button>
+  <button class="spin-btn" id="spinBtn" type="button"><strong>SPIN</strong><span>10 / 100 SPIN</span></button>
+</footer>
+
+<div class="auto-row">
+  <button id="auto10" type="button">AUTO 10</button>
+  <button id="auto100" type="button">AUTO 100</button>
+  <button id="stopAuto" type="button">STOP</button>
+</div>
+</div>
+
+<dialog id="paytableDialog">
+  <div class="dialog-card">
+    <button class="dialog-close" id="closeInfo" type="button" aria-label="Tutup">×</button>
+    <h2>PAYTABLE</h2>
+    <p>Permainan menggunakan kredit virtual. Tidak ada transaksi uang asli.</p>
+    <div class="payrow"><span>🍒 🍒 🍒</span><b>4× BET</b></div>
+    <div class="payrow"><span>🔔 🔔 🔔</span><b>10× BET</b></div>
+    <div class="payrow"><span>💎 💎 💎</span><b>25× BET</b></div>
+    <div class="payrow"><span>7️⃣ 7️⃣ 7️⃣</span><b>40× BET</b></div>
+    <div class="payrow"><span>👑 👑 👑</span><b>60× BET</b></div>
+    <div class="payrow"><span>💰 💰 💰</span><b>100× BET</b></div>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status"></div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   FORTUNE SPIN - FIXED REEL ENGINE
+   Perbaikan utama:
+   1. Strip dibuat cukup panjang sehingga target animasi selalu valid.
+   2. Tidak pernah mengarahkan reel ke posisi kosong.
+   3. Tinggi simbol diambil setelah DOM/layout siap.
+   4. Penyelesaian spin mengikuti durasi reel terlama.
+   5. Tiga simbol terakhir selalu dipertahankan setelah spin.
+========================================================= */
+
+const SYMBOLS = [
+  {e:"🍒",m:4},
+  {e:"🍋",m:5},
+  {e:"🍊",m:7},
+  {e:"🔔",m:10},
+  {e:"⭐",m:15},
+  {e:"💎",m:25},
+  {e:"7️⃣",m:40},
+  {e:"👑",m:60},
+  {e:"💰",m:100},
+  {e:"🃏",m:0,wild:true}
+];
+
+const strips=[...document.querySelectorAll(".reel-strip")];
+let credit=1000000;
+let bet=10000;
+let spinning=false;
+let autoLeft=0;
+let autoTimer=null;
+
+const $=id=>document.getElementById(id);
+
+function formatNumber(number){
+  return Math.floor(number).toLocaleString("en-US");
+}
+
+function randomSymbol(){
+  return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+}
+
+function getSymbolData(emoji){
+  return SYMBOLS.find(symbol=>symbol.e===emoji)||SYMBOLS[0];
+}
+
+function render(){
+  $("credit").textContent=formatNumber(credit);
+  $("bet").textContent=formatNumber(bet);
+}
+
+function makeSymbolElement(symbol){
+  const element=document.createElement("div");
+  element.className="symbol"+(symbol.wild?" wild":"");
+  element.textContent=symbol.e;
+  return element;
+}
+
+/*
+  Penting: jumlah simbol dibuat jauh lebih banyak daripada target.
+  Dengan 80 simbol, target selalu berada di dalam strip.
+*/
+function buildReel(strip, amount=80){
+  strip.innerHTML="";
+  const fragment=document.createDocumentFragment();
+
+  for(let i=0;i<amount;i++){
+    fragment.appendChild(makeSymbolElement(randomSymbol()));
+  }
+
+  strip.appendChild(fragment);
+}
+
+function createInitialReels(){
+  strips.forEach(strip=>{
+    strip.innerHTML="";
+    for(let i=0;i<3;i++){
+      strip.appendChild(makeSymbolElement(randomSymbol()));
+    }
+    strip.style.transition="none";
+    strip.style.transform="translate3d(0,0,0)";
+  });
+}
+
+function getVisibleGrid(){
+  return strips.map(strip=>{
+    const cells=[...strip.children];
+    return cells.slice(Math.max(0,cells.length-3),cells.length)
+      .map(cell=>cell.textContent);
+  });
+}
+
+function evaluateSpin(){
+  const grid=getVisibleGrid();
+
+  const paylines=[
+    [0,0,0,0,0],
+    [1,1,1,1,1],
+    [2,2,2,2,2],
+    [0,1,2,1,0],
+    [2,1,0,1,2]
+  ];
+
+  let totalWin=0;
+  let winningLines=0;
+
+  paylines.forEach(line=>{
+    const sequence=line.map((row,column)=>grid[column][row]);
+    const first=sequence[0];
+    let count=1;
+
+    for(let i=1;i<sequence.length;i++){
+      if(sequence[i]===first||sequence[i]==="🃏"||first==="🃏"){
+        count++;
+      }else{
+        break;
+      }
+    }
+
+    if(count>=3){
+      const data=getSymbolData(first);
+      let multiplier=data.m||5;
+      if(count===5) multiplier*=2;
+      totalWin+=bet*multiplier;
+      winningLines++;
+    }
+  });
+
+  return {totalWin,winningLines};
+}
+
+function clearWinLines(){
+  $("win-lines").innerHTML="";
+}
+
+function showWinLines(amount){
+  clearWinLines();
+  const rows=[16.6667,50,83.3333];
+  const total=Math.min(amount,3);
+
+  for(let i=0;i<total;i++){
+    const line=document.createElement("div");
+    line.className="win-line";
+    line.style.top=rows[i]+"%";
+    $("win-lines").appendChild(line);
+  }
+}
+
+function showToast(text){
+  const toast=$("toast");
+  toast.textContent=text;
+  toast.classList.add("show");
+  clearTimeout(toast._timer);
+  toast._timer=setTimeout(()=>toast.classList.remove("show"),1500);
+}
+
+function setBet(value){
+  bet=Math.max(1000,Math.min(100000,value));
+  render();
+}
+
+function stopAuto(){
+  autoLeft=0;
+
+  if(autoTimer){
+    clearTimeout(autoTimer);
+    autoTimer=null;
+  }
+
+  document.querySelectorAll(".auto-row button")
+    .forEach(button=>button.classList.remove("active"));
+}
+
+function startAuto(amount){
+  if(spinning) return;
+
+  stopAuto();
+  autoLeft=amount;
+
+  if(amount===10) $("auto10").classList.add("active");
+  if(amount===100) $("auto100").classList.add("active");
+
+  $("message").textContent="AUTO "+amount+" aktif";
+  spin();
+}
+
+/*
+  Jalankan satu spin.
+  Target posisi dihitung sebagai posisi tiga simbol terakhir,
+  bukan "extraTurns + lastThreeIndex" yang sebelumnya melebihi
+  jumlah elemen strip.
+*/
+function spin(){
+  if(spinning) return;
+
+  if(credit<bet){
+    showToast("Kredit tidak cukup");
+    $("message").textContent="Kredit tidak cukup";
+    stopAuto();
+    return;
+  }
+
+  spinning=true;
+  $("spinBtn").disabled=true;
+  credit-=bet;
+  render();
+  clearWinLines();
+  $("win").textContent="0";
+  $("message").textContent="Reel berputar...";
+
+  const REEL_COUNT=80;
+  const BASE_EXTRA=18;
+  const durations=[];
+
+  strips.forEach((strip,reelIndex)=>{
+    buildReel(strip,REEL_COUNT);
+
+    strip.style.transition="none";
+    strip.style.transform="translate3d(0,0,0)";
+
+    /*
+      Memaksa layout agar ukuran .symbol sudah benar,
+      termasuk pada browser HP setelah resize/orientation.
+    */
+    const firstCell=strip.children[0];
+    const cellHeight=firstCell.getBoundingClientRect().height;
+
+    const lastThreeIndex=REEL_COUNT-3;
+
+    /*
+      Kita harus berhenti di dalam strip.
+      Karena strip berisi 80 simbol, posisi 77 adalah
+      simbol pertama dari 3 simbol terakhir.
+    */
+    const targetIndex=lastThreeIndex;
+    const targetY=-(targetIndex*cellHeight);
+
+    const duration=1.25+(reelIndex*0.18);
+    durations.push(duration);
+
+    /*
+      Delay kecil antar reel membuat efek spin lebih natural,
+      tetapi semua reel tetap berisi simbol selama bergerak.
+    */
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        strip.style.transition=
+          "transform "+duration+"s cubic-bezier(.12,.72,.18,1)";
+        strip.style.transform=
+          "translate3d(0,"+targetY+"px,0)";
+      });
+    });
+  });
+
+  const longestDuration=Math.max(...durations);
+
+  /*
+    Tunggu sampai reel terakhir benar-benar selesai.
+    Sedikit buffer untuk memastikan frame terakhir sudah ter-render.
+  */
+  const finishDelay=(longestDuration*1000)+120;
+
+  setTimeout(()=>{
+    strips.forEach(strip=>{
+      const cells=[...strip.children];
+      const lastThree=cells.slice(cells.length-3);
+
+      /*
+        Pindahkan hanya tiga simbol yang sedang terlihat ke posisi 0.
+        Karena transition dimatikan dulu, perpindahan tidak terlihat.
+      */
+      strip.style.transition="none";
+      strip.innerHTML="";
+      lastThree.forEach(element=>strip.appendChild(element));
+      strip.style.transform="translate3d(0,0,0)";
+    });
+
+    /*
+      Force layout sekali lagi agar browser langsung menampilkan
+      tiga simbol hasil akhir sebelum evaluasi.
+    */
+    void strips[0].offsetHeight;
+
+    const result=evaluateSpin();
+
+    credit+=result.totalWin;
+    render();
+
+    $("win").textContent=formatNumber(result.totalWin);
+
+    if(result.totalWin>0){
+      $("message").textContent=
+        "Menang "+result.winningLines+" garis!";
+      showWinLines(result.winningLines);
+    }else{
+      $("message").textContent="Coba lagi";
+    }
+
+    spinning=false;
+    $("spinBtn").disabled=false;
+
+    if(autoLeft>0){
+      autoLeft--;
+
+      if(autoLeft>0){
+        autoTimer=setTimeout(spin,650);
+      }else{
+        stopAuto();
+      }
+    }
+  },finishDelay);
+}
+
+$("betMinus").addEventListener("click",()=>setBet(bet-1000));
+$("betPlus").addEventListener("click",()=>setBet(bet+1000));
+$("maxBet").addEventListener("click",()=>setBet(100000));
+$("spinBtn").addEventListener("click",spin);
+$("auto10").addEventListener("click",()=>startAuto(10));
+$("auto100").addEventListener("click",()=>startAuto(100));
+$("stopAuto").addEventListener("click",stopAuto);
+
+$("infoBtn").addEventListener("click",()=>$("paytableDialog").showModal());
+$("closeInfo").addEventListener("click",()=>$("paytableDialog").close());
+
+$("paytableDialog").addEventListener("click",event=>{
+  if(event.target===$("paytableDialog")){
+    $("paytableDialog").close();
+  }
+});
+
+/* INIT */
+createInitialReels();
+render();
+</script>
+</body>
+</html>

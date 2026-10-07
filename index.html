@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05070a">
+<meta name="description" content="Aplikasi resmi MyShort untuk Android.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>MyShort — Instal & Download</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{min-height:100vh;padding:18px;background:#05070a;color:#fff;font-family:Arial,Helvetica,sans-serif;display:flex;justify-content:center}.page{width:100%;max-width:480px;text-align:center;padding:10px 0 25px}.logo{width:108px;height:108px;object-fit:contain;display:block;margin:5px auto 14px;border-radius:24px;box-shadow:0 12px 35px #0008}.brand{font-size:32px;font-weight:800}.brand span{color:#b7f500}.subtitle{margin:7px 0 24px;color:#aeb5bd;font-size:14px}.card{background:#11151a;border:1px solid #252b32;border-radius:24px;padding:26px 20px;box-shadow:0 18px 50px #0008}.app-icon{width:74px;height:74px;border-radius:19px;object-fit:cover;display:block;margin:0 auto 16px}h1{font-size:24px;margin-bottom:9px}.description{font-size:14px;line-height:1.6;color:#aeb5bd;margin-bottom:20px}.info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}.info-box{background:#191e24;border:1px solid #262d35;border-radius:12px;padding:11px 7px}.label{font-size:10px;color:#7f8994;text-transform:uppercase;margin-bottom:5px}.value{font-size:13px;font-weight:700}.btn{width:100%;min-height:54px;border:0;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:800;cursor:pointer;text-decoration:none}.install{background:#b7f500;color:#071000;box-shadow:0 8px 20px #b7f50030}.download{margin-top:11px;background:#242a31;color:#fff;border:1px solid #343c45}.note{margin-top:12px;color:#818b96;font-size:11px;line-height:1.5}.guide{text-align:left;margin-top:24px;padding-top:21px;border-top:1px solid #282e35}.guide h2{font-size:16px;margin-bottom:14px}.step{display:flex;gap:11px;margin-bottom:13px}.num{flex:0 0 27px;width:27px;height:27px;border-radius:50%;background:#b7f500;color:#071000;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}.step p{color:#b5bdc6;font-size:13px;line-height:1.5;padding-top:3px}.status{margin-top:14px;padding:10px 12px;border-radius:10px;background:#0b1007;color:#b7f500;font-size:12px;line-height:1.45}.security{margin-top:18px;padding:13px;background:#0c1014;border:1px solid #242a31;border-radius:12px;color:#858f99;font-size:11px;line-height:1.5}footer{margin-top:18px;color:#69737e;font-size:11px}[hidden]{display:none!important}@media(max-width:380px){.logo{width:92px;height:92px}.brand{font-size:28px}.card{padding:23px 17px}}
+</style>
+</head>
+<body>
+<main class="page">
+<img src="./logo.png" alt="MyShort" class="logo">
+<div class="brand">My<span>Short</span></div>
+<div class="subtitle">Aplikasi resmi MyShort</div>
+<section class="card">
+<img src="./icon-192.png" alt="Ikon MyShort" class="app-icon">
+<h1>Instal MyShort</h1>
+<p class="description">Pasang MyShort di layar utama Android dan buka seperti aplikasi melalui Chrome.</p>
+<div class="info">
+<div class="info-box"><div class="label">Platform</div><div class="value">Android</div></div>
+<div class="info-box"><div class="label">Jenis</div><div class="value">PWA</div></div>
+<div class="info-box"><div class="label">Mode</div><div class="value">Standalone</div></div>
+<div class="info-box"><div class="label">Status</div><div class="value">Resmi</div></div>
+</div>
+<button id="installButton" class="btn install" hidden>⬇ &nbsp; INSTAL MYSHORT</button>
+<a href="MyShort_2.23.apk" download="MyShort_2.23.apk" class="btn download">↓ &nbsp; Download APK MyShort</a>
+<div class="note">Tombol INSTAL MYSHORT memasang PWA dari Chrome. Tombol APK mengunduh file APK Android.</div>
+<div class="guide">
+<h2>Cara instal dari Chrome</h2>
+<div class="step"><div class="num">1</div><p>Buka halaman ini dengan <b>Chrome Android</b> melalui HTTPS.</p></div>
+<div class="step"><div class="num">2</div><p>Tekan <b>INSTAL MYSHORT</b> jika tombol tersedia.</p></div>
+<div class="step"><div class="num">3</div><p>Konfirmasi pemasangan pada dialog Chrome.</p></div>
+<div class="step"><div class="num">4</div><p>Ikon MyShort akan muncul di layar utama dan dapat dibuka seperti aplikasi.</p></div>
+</div>
+<div id="status" class="status">Memeriksa dukungan instalasi Chrome…</div>
+<div class="security">🔒 Gunakan alamat HTTPS resmi MyShort. Jangan menginstal APK dari sumber yang tidak dikenal.</div>
+</section>
+<footer>© 2026 MyShort. All rights reserved.</footer>
+</main>
+<script>
+let deferredPrompt=null;
+const btn=document.getElementById("installButton"),status=document.getElementById("status");
+const standalone=()=>window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
+if(standalone())status.textContent="✓ MyShort sedang berjalan sebagai aplikasi.";
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;btn.hidden=false;status.textContent="✓ MyShort siap dipasang sebagai aplikasi.";});
+btn.addEventListener("click",async()=>{if(!deferredPrompt){status.textContent="Tombol instal belum tersedia. Gunakan Chrome Android melalui HTTPS lalu buka menu ⋮ > Instal aplikasi jika tersedia.";return;}deferredPrompt.prompt();const r=await deferredPrompt.userChoice;status.textContent=r.outcome==="accepted"?"✓ Instalasi MyShort dikonfirmasi.":"Instalasi dibatalkan. Anda dapat mencoba lagi.";deferredPrompt=null;btn.hidden=true;});
+window.addEventListener("appinstalled",()=>{btn.hidden=true;status.textContent="✓ MyShort berhasil dipasang.";});
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(console.error));
+</script>
+</body>
+</html>
